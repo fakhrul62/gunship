@@ -1,0 +1,41 @@
+/* Shared positions keep the road, defenses and vehicle routes coherent. */
+window.SectorWorld=class SectorWorld{
+ static route=[{x:0,z:-1800},{x:-100,z:-600},{x:0,z:900},{x:0,z:1200},{x:500,z:1320},{x:1400,z:1400},{x:2300,z:2300}];
+ static {const raw=this.route,curve=[];for(let i=0;i<raw.length-1;i++){const a=raw[Math.max(0,i-1)],b=raw[i],c=raw[i+1],d=raw[Math.min(raw.length-1,i+2)];for(let j=0;j<16;j++){const t=j/16,t2=t*t,t3=t2*t;const sample=k=>.5*((2*b[k])+(-a[k]+c[k])*t+(2*a[k]-5*b[k]+4*c[k]-d[k])*t2+(-a[k]+3*b[k]-3*c[k]+d[k])*t3);curve.push({x:sample('x'),z:sample('z')})}}curve.push(raw.at(-1));this.route=curve}
+ static roadInfo(x,z){let best={distance:Infinity,x:0,z:0};const p=this.route;for(let i=1;i<p.length;i++){const a=p[i-1],b=p[i],dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz))),px=a.x+dx*t,pz=a.z+dz*t,d=Math.hypot(x-px,z-pz);if(d<best.distance)best={distance:d,x:px,z:pz,heading:Math.atan2(dx,dz)}}return best}
+ static formation(phase,wave,n,air){const x=phase==='assault'?0:1400,z=phase==='assault'?1200:1400;
+  if(air){const patrol=phase==='intercept';return{x:x+(patrol?650:420)+(n%2)*90,z:z+(wave?1050:230)+Math.floor(n/2)*140,y:patrol?185:145}}
+  if(wave){const road=phase==='assault'?{x:0,z:900}:{x:2300,z:2300};return{x:road.x+(n%2)*6,z:road.z+150+n*65,y:0}}
+  return{x:x+(n%2?70:-70),z:z+35+n*32,y:0}
+ }
+ constructor(B,scene,height,shadows){this.B=B;this.scene=scene;this.height=height;this.cover=[];this.meshes=[];this.landmarks=[{x:0,z:1200,name:'CHECKPOINT ALPHA'},{x:1400,z:1400,name:'RADAR STATION'},{x:0,z:-1600,name:'FORWARD BASE'}];this.materials={};
+  const make=(name,color)=>{const m=new B.PBRMaterial(name,scene);m.albedoColor=B.Color3.FromHexString(color).toLinearSpace();m.metallic=0;m.roughness=.95;return m};
+  this.materials.concrete=make('weatheredBlastwalls','#9e9276');this.materials.steel=make('outpostSteel','#5b6251');this.materials.dark=make('rubberAndChar','#37352e');this.materials.sand=make('barrierFill','#b7a482');this.materials.mark=make('landingPaint','#d7d0b7');
+  const tex=new B.DynamicTexture('concreteSurface',256,scene,false),ctx=tex.getContext();ctx.fillStyle='#aaa08b';ctx.fillRect(0,0,256,256);for(let i=0;i<3000;i++){ctx.fillStyle=i%2?'#969080':'#bbb09b';ctx.fillRect((i*73)%256,(i*127)%256,2,2)}tex.update();this.materials.concrete.albedoTexture=tex;
+  const add=(name,x,z,w,h,d,kind='concrete',solid=true)=>{const m=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);m.position.set(x,height(x,z)+h/2,z);m.material=this.materials[kind];m.receiveShadows=true;m.isPickable=false;this.meshes.push(m);if(solid){m.computeWorldMatrix(true);const bb=m.getBoundingInfo().boundingBox;this.cover.push({min:bb.minimumWorld.clone(),max:bb.maximumWorld.clone(),mesh:m})}return m};this.add=add;
+  this.buildRoad();
+  for(const loc of this.landmarks){const {x,z}=loc;
+   // Gapped perimeter leaves the road and vehicle firing lanes clear.
+   for(let i=0;i<8;i++){add('blastwall',x-100+i*25,z+100,22,5,3);if(i<3||i>4)add('blastwall',x-100+i*25,z-90,22,5,3)}
+   for(let i=0;i<5;i++){add('blastwall',x-115,z-60+i*32,3,5,27);add('blastwall',x+110,z-60+i*32,3,5,27)}
+   add('operationsShelter',x-65,z+40,24,8,15,'sand');add('shelterRoof',x-65,z+40,27,.6,18,'steel',false).position.y=height(x-65,z+40)+8;
+   for(let n=0;n<3;n++){const cx=x-76+n*9;add('equipmentContainer',cx,z+70,7,5,16,'steel');for(let rib=0;rib<5;rib++)add('containerRib',cx-3.6,z+64+rib*3,.2,5,.2,'dark',false)}
+   for(let n=0;n<6;n++){const drum=B.MeshBuilder.CreateCylinder('fuelDrum',{height:3,diameter:2.3,tessellation:10},scene);drum.position.set(x+65+(n%3)*4,height(x+65+(n%3)*4,z+65+Math.floor(n/3)*4)+1.5,z+65+Math.floor(n/3)*4);drum.material=this.materials.dark;drum.isPickable=false;drum.freezeWorldMatrix();this.meshes.push(drum)}
+   const towerX=x+75,towerZ=z+40;for(const dx of [-4,4])for(const dz of [-4,4])add('towerLeg',towerX+dx,towerZ+dz,.6,25,.6,'steel');add('towerDeck',towerX,towerZ,12,1,12,'steel',false).position.y=height(towerX,towerZ)+24;
+   const dish=B.MeshBuilder.CreateSphere('radarDish',{diameter:10,segments:12,slice:.5},scene);dish.position.set(towerX,height(towerX,towerZ)+29,towerZ);dish.rotation.x=-Math.PI/3;dish.scaling.y=.25;dish.material=this.materials.steel;dish.isPickable=false;this.meshes.push(dish);
+   for(const mesh of this.meshes.slice(-8))shadows.addShadowCaster(mesh,false);
+  }
+  // A marked extraction pad establishes familiar human scale.
+  this.patch('landingPad',0,-1600,65,65,this.materials.dark);
+  for(const x of [-10,10])add('helipadH',x,-1600,3,.12,28,'mark',false);add('helipadH',0,-1600,23,.12,3,'mark',false);
+  for(const x of [-160,165]){const wreck=add('ruinedWall',x,1050,18,5,2);wreck.rotation.z=x<0?.15:-.1;wreck.unfreezeWorldMatrix();wreck.computeWorldMatrix(true);wreck.freezeWorldMatrix()}
+  const groups=new Map();for(const mesh of this.meshes){mesh.computeWorldMatrix(true);shadows.removeShadowCaster(mesh,false);if(!groups.has(mesh.material))groups.set(mesh.material,[]);groups.get(mesh.material).push(mesh)}this.meshes=[];for(const [mat,list] of groups){const mesh=B.Mesh.MergeMeshes(list,true,true,undefined,false,false);if(mesh){mesh.name='sector-'+mat.name;mesh.material=mat;mesh.isPickable=false;mesh.receiveShadows=true;mesh.freezeWorldMatrix();this.meshes.push(mesh);if(mat!==this.materials.mark&&mat.name!=='compactedConvoyRoad')shadows.addShadowCaster(mesh,false)}}
+ }
+ patch(name,x,z,w,d,material){const B=this.B,m=B.MeshBuilder.CreateGround(name,{width:w,height:d,subdivisions:8,updatable:true},this.scene),p=m.getVerticesData(B.VertexBuffer.PositionKind);for(let i=0;i<p.length;i+=3)p[i+1]=this.height(x+p[i],z+p[i+2])+.22;m.updateVerticesData(B.VertexBuffer.PositionKind,p);m.position.set(x,0,z);m.material=material;m.receiveShadows=true;m.isPickable=false;this.meshes.push(m);return m}
+ buildRoad(){const B=this.B,mat=new B.PBRMaterial('compactedConvoyRoad',this.scene);mat.albedoColor=new B.Color3(.39,.30,.20);mat.roughness=1;mat.metallic=0;const p=[],idx=[],uv=[],pts=[];for(let j=1;j<SectorWorld.route.length;j++){const a=SectorWorld.route[j-1],b=SectorWorld.route[j],steps=Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/15);for(let i=0;i<steps;i++)pts.push({x:a.x+(b.x-a.x)*i/steps,z:a.z+(b.z-a.z)*i/steps})}pts.push(SectorWorld.route.at(-1));this.roadPoints=pts;
+  let distance=0;for(let i=0;i<pts.length;i++){const q=pts[i],next=pts[Math.min(i+1,pts.length-1)],prev=pts[Math.max(i-1,0)],dir=new B.Vector3(next.x-prev.x,0,next.z-prev.z).normalize(),right=new B.Vector3(dir.z,0,-dir.x);if(i)distance+=Math.hypot(q.x-prev.x,q.z-prev.z);for(const side of [-1,1]){const x=q.x+right.x*side*11,z=q.z+right.z*side*11;p.push(x,this.height(x,z)+.3,z);uv.push((side+1)/2,distance/25)}if(i<pts.length-1){let n=i*2;idx.push(n,n+2,n+1,n+1,n+2,n+3)}}
+  const mesh=new B.Mesh('convoyRoad',this.scene),data=new B.VertexData(),norm=[];B.VertexData.ComputeNormals(p,idx,norm);data.positions=p;data.indices=idx;data.normals=norm;data.uvs=uv;data.applyToMesh(mesh);mat.backFaceCulling=false;mesh.material=mat;mesh.receiveShadows=true;mesh.isPickable=false;
+  const tex=new B.DynamicTexture('roadWheelTracks',{width:128,height:256},this.scene,false),c=tex.getContext();c.clearRect(0,0,128,256);const gradient=c.createLinearGradient(0,0,128,0);gradient.addColorStop(0,'rgba(170,145,105,0)');gradient.addColorStop(.15,'rgba(170,145,105,.85)');gradient.addColorStop(.85,'rgba(170,145,105,.85)');gradient.addColorStop(1,'rgba(170,145,105,0)');c.fillStyle=gradient;c.fillRect(0,0,128,256);for(const x of [42,82]){c.fillStyle='rgba(135,114,84,.5)';c.fillRect(x-8,0,16,256);for(let y=0;y<256;y+=14){c.fillStyle='rgba(120,101,75,.25)';c.fillRect(x-8,y,16,3)}}tex.update();tex.vScale=1;tex.hasAlpha=true;mat.albedoTexture=tex;mat.useAlphaFromAlbedoTexture=true;mat.transparencyMode=B.PBRMaterial.PBRMATERIAL_ALPHABLEND;mat.albedoColor=B.Color3.White();this.meshes.push(mesh)
+ }
+ hit(a,b){let first=null;const d=b.subtract(a);for(const box of this.cover){let lo=0,hi=1;for(const axis of ['x','y','z']){if(Math.abs(d[axis])<1e-8){if(a[axis]<box.min[axis]||a[axis]>box.max[axis]){hi=-1;break}}else{const x=(box.min[axis]-a[axis])/d[axis],y=(box.max[axis]-a[axis])/d[axis];lo=Math.max(lo,Math.min(x,y));hi=Math.min(hi,Math.max(x,y))}}if(hi>=lo&&(first===null||lo<first))first=lo}return first}
+};

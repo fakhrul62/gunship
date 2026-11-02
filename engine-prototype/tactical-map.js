@@ -20,6 +20,7 @@ window.TacticalMap=class TacticalMap {
   // World grid rotates and scrolls with the helicopter; it is separate from map markers.
   c.save();c.translate(center,center);c.rotate(-yaw);const spacing=range/3,step=radius/3;
   for(let i=-7;i<=7;i++){let x=i*step-((player.x%spacing)/range*radius),y=i*step+((player.z%spacing)/range*radius);c.beginPath();c.moveTo(x,-size*2);c.lineTo(x,size*2);c.stroke();c.beginPath();c.moveTo(-size*2,y);c.lineTo(size*2,y);c.stroke()}c.restore();
+  if(window.SectorWorld){c.strokeStyle='#a08b63';c.lineWidth=1.2;c.beginPath();window.SectorWorld.route.forEach((point,i)=>{const p=project(point,1e9);if(i)c.lineTo(p.x,p.y);else c.moveTo(p.x,p.y)});c.stroke()}
   const base=project({x:0,z:-1600});c.fillStyle='#83978b';c.fillRect(base.x-3,base.y-3,6,6);
   for(const enemy of contacts){const p=project(enemy.obj.position);c.save();c.translate(p.x,p.y);c.fillStyle='#ff7f66';c.strokeStyle='#ff7f66';c.lineWidth=1.5;
    if(p.outside){c.rotate(p.angle);c.beginPath();c.moveTo(5,0);c.lineTo(-3,-4);c.lineTo(-3,4);c.closePath();c.stroke()}

@@ -59,3 +59,12 @@
 @media(max-width:720px){#screen-menu{padding:22px;align-items:flex-start;background:linear-gradient(180deg,#0c100fee,transparent 75%)}#screen-menu .menu-copy{width:100%;padding-left:12px}#screen-menu h1{font-size:54px;margin:15px 0}#screen-menu .intro,#screen-menu .lede,#screen-menu .free-note{display:none}#screen-menu .menu-actions{flex-direction:row;align-items:center;gap:16px}#screen-menu .primary{min-width:170px;padding:14px}#hangar-view{left:5%;right:5%;top:39%;bottom:9%}.hangar-caption strong{font-size:23px}.hangar-caption span{display:none}.hangar-caption{bottom:12px}#screen-pause .pause-card{padding:26px}.pause-details{font-size:8px}}
 
 #missile-lock{position:absolute;top:calc(50% + 32px);left:50%;transform:translateX(-50%);pointer-events:none;z-index:3;font:9px monospace;letter-spacing:.1em;color:#e4d6b3;text-shadow:0 1px 3px #000;background:#101914a0;padding:5px 8px}#missile-lock.locked{color:#ffb56e;border-bottom:2px solid #ffb56e}#missile-lock[hidden]{display:none}
+
+.asset-credit{position:absolute;bottom:55px;right:7vw;color:#aeb5a5;font:9px monospace;pointer-events:auto;text-decoration:none}
+
+/* Legible flight instruments against bright desert skies. */
+#hud{position:absolute;inset:0;pointer-events:none;z-index:2}
+#hud:before{content:'';position:absolute;inset:0 0 auto;height:110px;background:linear-gradient(#07100ec9,#07100e45 70%,transparent);pointer-events:none}
+.hud-brand small,.hud-objective small,.hud-readouts small{color:#d0d8cf!important;text-shadow:0 1px 3px #000;font-size:10px!important}.hud-objective strong,.hud-readouts b,.hud-brand{color:#f3f1df;text-shadow:0 1px 4px #000}.hud-objective strong{font-size:19px}.hud-readouts b{font-size:15px}
+#missile-lock{top:auto;bottom:24px;left:50%;padding:8px 12px;font-size:10px;background:#0d1916e8;border:1px solid #9b9d7966;color:#e9dfbd}
+@media(max-width:720px){#missile-lock{bottom:185px}.hud-objective strong{font-size:13px}.hud-readouts b{font-size:11px}}

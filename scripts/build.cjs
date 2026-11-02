@@ -1,8 +1,9 @@
 const fs=require('node:fs');const path=require('node:path');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'dist');
 fs.mkdirSync(out,{recursive:true});
-const files=['index.html','style.css','battlefield-ground.png','hangar.png','odz-10ag_attack_helicopter_10a.glb','enemy/fictional_cold_war_tank.glb','enemy/rtbr_helicopter.glb','enemy/scifi_turret.glb','terrain/large_stylized_japanese_terrain_mesh.glb','engine-prototype/index.html','engine-prototype/engine.js','engine-prototype/tactical-map.js'];
+const files=['index.html','style.css','battlefield-ground.png','hangar.png','odz-10ag_attack_helicopter_10a.glb','enemy/fictional_cold_war_tank.glb','enemy/rtbr_helicopter.glb','enemy/scifi_turret.glb','terrain/large_stylized_japanese_terrain_mesh.glb','engine-prototype/index.html','engine-prototype/engine.js','engine-prototype/tactical-map.js','engine-prototype/combat-assets.js','engine-prototype/battlefield-material.js','engine-prototype/sector-world.js'];
 for(const file of files){const dest=path.join(out,file);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,file),dest)}
+fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 for(const [source,target] of [['babylonjs/babylon.js','babylon.js'],['babylonjs-loaders/babylonjs.loaders.min.js','babylonjs.loaders.min.js']]){const dest=path.join(out,'engine-prototype/vendor',target);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,'engine-prototype/node_modules',source),dest)}
 const html=path.join(out,'engine-prototype/index.html');fs.writeFileSync(html,fs.readFileSync(html,'utf8').replace('./node_modules/babylonjs/babylon.js','./vendor/babylon.js').replace('./node_modules/babylonjs-loaders/babylonjs.loaders.min.js','./vendor/babylonjs.loaders.min.js'));
 fs.writeFileSync(path.join(out,'.nojekyll'),'');console.log('Built static game in dist/');

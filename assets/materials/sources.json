@@ -1,0 +1,23 @@
+[
+  {
+    "asset": "aerial_rocks_01",
+    "source": "https://polyhaven.com/a/aerial_rocks_01",
+    "license": "CC0"
+  },
+  {
+    "asset": "brown_mud_dry",
+    "source": "https://polyhaven.com/a/brown_mud_dry",
+    "license": "CC0"
+  },
+  {
+    "asset": "kloofendal_48d_partly_cloudy_puresky",
+    "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
+    "license": "CC0"
+  },
+  {
+    "asset": "rusty_painted_metal",
+    "source": "https://polyhaven.com/a/rusty_painted_metal",
+    "license": "CC0",
+    "use": "subtle painted helicopter normal and roughness detail; original paint colors retained"
+  }
+]
