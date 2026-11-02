@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#08151b"><title>ROTOR STRIKE — Aerial Combat</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main id="game-shell">
+  <canvas id="scene" aria-label="Rotor Strike helicopter combat game"></canvas>
+  <div id="grain"></div>
+  <header id="hud" class="hidden">
+    <div class="hud-brand"><span class="dot"></span><span>ROTOR <b>STRIKE</b></span><small id="mission-tag">OPERATION 01</small></div>
+    <div class="hud-objective"><small>MISSION OBJECTIVE</small><strong id="objective">DESTROY HOSTILE TARGETS</strong><div class="objective-track"><i id="objective-fill"></i></div></div>
+    <div class="hud-readouts"><div><small>HULL</small><div class="hull-bar"><i id="hull-fill"></i></div></div><div class="weapon"><small>WEAPON</small><b id="weapon-label">30MM CANNON</b></div><div class="altitude"><small>ALT</small><b id="altitude">1200 <em>FT</em></b></div></div>
+  </header>
+  <div id="reticle" class="hidden"><i></i><b></b><i></i></div>
+  <div id="toast" class="toast hidden"></div>
+  <section id="screen-menu" class="screen">
+    <div class="menu-copy"><div class="eyebrow"><span></span> TACTICAL FLIGHT SIMULATION</div><h1>ROTOR<br><i>STRIKE</i></h1><p class="lede">WINGS OF FIRE. NO STRINGS ATTACHED.</p><p class="intro">Take the controls. Fly into hostile territory. Bring your squadron home.</p><div class="menu-actions"><button class="primary" id="launch">SELECT OPERATION <span>↗</span></button><button class="text-button" id="controls-link">FLIGHT CONTROLS <span>＋</span></button></div><div class="free-note"><span>●</span> ALL MISSIONS AVAILABLE <b>·</b> NO PURCHASES · NO CURRENCY</div></div>
+    <div id="hangar-view" tabindex="0" aria-label="Helicopter inspection. Drag to rotate, scroll to zoom, arrow keys to rotate."><div class="hangar-heading">AIRCRAFT INSPECTION <span>VIPER 01</span></div><div id="hangar-status">LOADING AIRCRAFT...</div><div class="hangar-caption"><strong>ODZ-10AG</strong><span>ATTACK HELICOPTER / READY FOR SORTIE</span><small>DRAG TO ROTATE &nbsp; / &nbsp; SCROLL TO ZOOM</small><button id="hangar-reset" class="text-button">RESET VIEW</button></div></div>
+    <div class="menu-footer"><span>FLIGHT SYSTEMS // 01.01</span><span>SIMULATION MODE <i>● ONLINE</i></span><span>DHaka A.O. / SECTOR 07</span></div>
+  </section>
+  <section id="screen-missions" class="screen hidden">
+    <div class="panel-heading"><div><div class="eyebrow"><span></span> BRIEFING ROOM / ALL SORTIES CLEARED FOR ACCESS</div><h2>CHOOSE YOUR <i>OPERATION</i></h2></div><button class="close-button" id="back-menu">ESC <span>×</span></button></div>
+    <div id="mission-grid" class="mission-grid"></div><div class="mission-foot"><span>SELECT ANY OPERATION TO BEGIN</span><span>THERE ARE NO LOCKED MISSIONS OR PAID UPGRADES.</span></div>
+  </section>
+  <section id="screen-controls" class="screen hidden">
+    <div class="controls-card"><div class="eyebrow"><span></span> FLIGHT MANUAL / QUICK REFERENCE</div><h2>YOUR HELICOPTER.<br><i>YOUR CALL.</i></h2><div class="control-grid"><div><kbd>W A S D</kbd><span>FORWARD / STRAFE</span></div><div><kbd>MOUSE</kbd><span>TURN / PITCH</span></div><div><kbd>CLICK / SPACE</kbd><span>FIRE CANNON</span></div><div><kbd>R</kbd><span>FIRE ROCKET</span></div><div><kbd>Q / E</kbd><span>DESCEND / CLIMB</span></div><div><kbd>ESC</kbd><span>PAUSE / RESUME</span></div></div><p class="mobile-hint">ON TOUCHSCREENS: left stick to fly · drag right side to aim · FIRE / ROCKET / FLARE buttons at lower right.</p><button class="primary" id="controls-back">BACK TO HANGAR <span>↗</span></button></div>
+  </section>
+  <section id="screen-pause" class="screen hidden"><div class="pause-card"><div class="eyebrow"><span></span> FLIGHT PAUSED</div><h2>FLIGHT <i>PAUSED.</i></h2><p class="pause-description">Your sortie is on hold. Resume when ready to return to the operation.</p><div class="pause-details"><span>VIPER 01 / FLIGHT CONTROL</span><span>ESC TO RESUME</span></div><button class="primary" id="resume">RESUME FLIGHT <span>↗</span></button><button class="text-button" id="quit-mission">RETURN TO HANGAR <span>↗</span></button></div></section>
+  <section id="screen-result" class="screen hidden"><div class="result-card"><div class="eyebrow" id="result-eyebrow"><span></span> DEBRIEF / TRANSMISSION RECEIVED</div><h2 id="result-title">MISSION <i>COMPLETE.</i></h2><p id="result-copy"></p><div class="result-stats"><div><small>TARGETS DESTROYED</small><b id="stat-targets">0</b></div><div><small>FLIGHT TIME</small><b id="stat-time">00:00</b></div><div><small>HULL STATUS</small><b id="stat-hull">100%</b></div></div><button class="primary" id="replay">FLY AGAIN <span>↗</span></button><button class="text-button" id="result-hangar">CHOOSE ANOTHER OPERATION <span>↗</span></button></div></section>
+  <div id="mobile-controls" class="hidden"><div class="stick-zone"><div id="stick-base"><div id="stick-knob"></div></div><small>FLIGHT</small></div><div class="touch-actions"><button id="touch-fire">FIRE</button><button id="touch-rocket">ROCKET</button><button id="touch-flare">UP</button><small>HOLD UP TO CLIMB</small></div></div>
+</main>
+<script src="./node_modules/babylonjs/babylon.js"></script>
+<script src="./node_modules/babylonjs-loaders/babylonjs.loaders.min.js"></script>
+<script src="tactical-map.js"></script>
+<script src="engine.js"></script>
+</body></html>

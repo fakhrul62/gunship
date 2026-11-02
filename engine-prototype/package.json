@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "babylonjs": "^9.33.1",
+    "babylonjs-loaders": "^9.33.1"
+  }
+}

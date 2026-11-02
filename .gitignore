@@ -1,0 +1,13 @@
+node_modules/
+**/node_modules/
+dist/
+*.log
+.*-check.cjs
+*-check.png
+*-preview*.png
+*-fixed.png
+three-*.png
+model-preview.png
+enemy/black_squad_soldier_character.glb
+enemy/turret.glb
+terrain.png
