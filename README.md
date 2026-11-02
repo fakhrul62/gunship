@@ -49,3 +49,7 @@ The active terrain material restores the original tan desert image with restrain
 The current local sector has a curved convoy route linking a forward base, Alpha checkpoint and Bravo radar station. Static defensive walls, shelters, containers, drums and towers are merged into six draw groups. Walls block projectiles and sightlines and reduce nearby indirect blast damage. The minimap displays the road; tanks steer toward it and follow it into their assigned positions. Helicopters patrol in paired offsets before contact and maneuver around the player during combat. All enemy models are placed before takeoff. HUD labels have a contrast backing and missile status is below the aircraft.
 
 Validation covers road projection and cover intersection, native-resolution rendering, boosted approach flight, nearby enemy detection, transition into the assault, weapon firing, pause/resume and restarting another mission. This is a playable desert-sector implementation; environment props are lightweight procedural geometry rather than photogrammetric building models.
+
+## Selected imported buildings and sounds
+
+Five static buildings/props and three weapon/impact sounds from the supplied Gunship Battle APK are packaged under `assets/gunship/` for the hosted game. These assets are separate from the CC0 Poly Haven materials. The full extraction output, reports and unused models remain ignored under `local-apk-assets/`. The selected GLBs embed their textures and do not require the original APK at runtime. The separate optional explosion pack remains local-only.

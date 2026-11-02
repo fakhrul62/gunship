@@ -1,0 +1,15 @@
+{
+  "models": [
+    "Desert_House_A_02",
+    "Desert_House_D_01",
+    "Desert_House_C_02",
+    "Hangar_A",
+    "OilTank_red"
+  ],
+  "sounds": [
+    "30mm_shoot.wav",
+    "missile_shoot.wav",
+    "BulletHit_Metal.wav"
+  ],
+  "source": "Selected user-supplied Gunship Battle APK assets; not covered by the Poly Haven CC0 license."
+}
