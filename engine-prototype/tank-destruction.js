@@ -9,7 +9,8 @@ window.TankDestruction=class TankDestruction{
   const finishes=new Map();for(const mesh of root.getChildMeshes()){mesh.metadata={...mesh.metadata,combatTarget:null};const original=mesh.material;if(!original)continue;if(!finishes.has(original)){const mat=original.clone('burned-'+original.name);if(mat.albedoColor)mat.albedoColor=new B.Color3(.10,.075,.055);if('metallic' in mat)mat.metallic=.12;if('roughness' in mat)mat.roughness=.98;mat.emissiveColor=B.Color3.Black();finishes.set(original,mat);this.materials.push(mat)}mesh.material=finishes.get(original)}
   const nodes=root.getChildTransformNodes();const turret=nodes.find(n=>n.name.startsWith('Turret_low_23'));
   const names=['Mantle_27','Hatch.001_24','Hatch.002_25','Roadwheel_low_28','Roadwheel_low.001_33'];
-  const selected=[turret,...names.map(name=>nodes.find(n=>n.name.startsWith(name)))].filter(Boolean);
+  const roofPanels=window.WreckInterior.open(B,this.scene,root,turret);
+  const selected=[turret,...roofPanels,...names.map(name=>nodes.find(n=>n.name.startsWith(name)))].filter(Boolean);
   let id=0;for(const node of selected){if(this.parts.length>=48)break;if(selected.some(other=>other!==node&&node.isDescendantOf(other)))continue;
    node.computeWorldMatrix(true);const box=node.getHierarchyBoundingVectors(true),center=box.min.add(box.max).scale(.5);if(!Number.isFinite(center.x))continue;
    const pivot=new B.TransformNode('tankFragment-'+id,this.scene);pivot.position.copyFrom(center);node.setParent(pivot,true);pivot.computeWorldMatrix(true);
@@ -19,6 +20,7 @@ window.TankDestruction=class TankDestruction{
   }
   this.wrecks.push({root,age:0});return true;
  }
+ breakRotor(root){const B=this.B,rotor=root.metadata?.rotors?.[0];if(!rotor)return;const blades=rotor.getChildMeshes().filter(m=>m.name==='blade'&&!m.metadata?.visualOnly);for(const node of blades.filter((_,i)=>i%2===0)){if(this.parts.length>=48)break;node.computeWorldMatrix(true);const bounds=node.getBoundingInfo().boundingBox,center=bounds.centerWorld.clone(),pivot=new B.TransformNode('rotorFragment',this.scene);pivot.position.copyFrom(center);node.setParent(pivot,true);this.parts.push({pivot,node,velocity:new B.Vector3(4,6,-3),spin:new B.Vector3(1,2,.5),age:0,sleep:false,bounces:0,heavy:false})}}
  update(dt){const B=this.B;for(const part of this.parts){if(part.sleep||part.pivot.isDisposed())continue;const steps=Math.max(1,Math.ceil(dt/.016)),step=dt/steps;for(let k=0;k<steps;k++){
    part.age+=step;part.velocity.y-=9.81*step;part.velocity.scaleInPlace(Math.exp(-.08*step));part.pivot.position.addInPlace(part.velocity.scale(step));part.pivot.rotation.addInPlace(part.spin.scale(step));part.pivot.computeWorldMatrix(true);
    const bounds=part.pivot.getHierarchyBoundingVectors(true);const support=Math.max(this.height(bounds.min.x,bounds.min.z),this.height(bounds.max.x,bounds.max.z),this.height(part.pivot.position.x,part.pivot.position.z));

@@ -17,7 +17,7 @@
  const armorModel=new window.ArmorModel(B);
  const flightCollision=new window.FlightCollision(B,(x,z)=>groundHeight(x,z),()=>sector?.cover||[]);
  const playerDamage=new window.PlayerDamage(B,combatAssets,(x,z)=>groundHeight(x,z));
- const aircraftDamage=new window.AircraftDamage(B,combatAssets,(x,z)=>flightCollision.support(x,z),(root,pos)=>{burst(pos,'explosion');sound('explosion',pos);combatAssets.wreck(root)});
+ const aircraftDamage=new window.AircraftDamage(B,combatAssets,(x,z)=>flightCollision.support(x,z),(root,pos)=>{tankDestruction.breakRotor(root);burst(pos,'explosion');sound('explosion',pos);combatAssets.wreck(root)});
  const localApkAssets=new window.LocalApkAssets(B,scene);
  let preview=null,sector=null;
  let mode='menu',game=null,loading=false,assets={},time=0;const keys=new Set(),regions=[];let groundHeight=()=>0;const tacticalMap=new window.TacticalMap($('game-shell'));
