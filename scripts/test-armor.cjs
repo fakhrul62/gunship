@@ -1,0 +1,11 @@
+const B=require('../engine-prototype/node_modules/babylonjs'),fs=require('fs'),vm=require('vm'),assert=require('assert');
+const c={window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync('engine-prototype/armor-model.js','utf8'),c);
+const engine=new B.NullEngine(),scene=new B.Scene(engine),root=new B.TransformNode('tank',scene);root.metadata={combat:{key:'apc'}};
+const m=B.MeshBuilder.CreateBox('Hull_low',{},scene);m.parent=root;
+const model=new c.window.ArmorModel(B),enemy={obj:root};
+const front=model.resolve(enemy,m,new B.Vector3(0,0,1),new B.Vector3(0,0,-900),60),rear=model.resolve(enemy,m,new B.Vector3(0,0,-1),new B.Vector3(0,0,900),60);
+assert.equal(front.kind,'stopped');assert.equal(rear.kind,'penetration');assert(rear.remaining<60);
+const glance=model.resolve(enemy,m,new B.Vector3(1,0,0),new B.Vector3(-80,0,896),95);assert.equal(glance.kind,'ricochet');assert.equal(glance.damage,0);
+const direct=model.resolve(enemy,m,new B.Vector3(0,0,1),new B.Vector3(0,0,-900),95);assert.equal(direct.kind,'penetration');assert.equal(direct.damage,1);
+root.rotation.y=Math.PI;const turned=model.resolve(enemy,m,new B.Vector3(0,0,1),new B.Vector3(0,0,-900),60);assert.equal(turned.kind,'penetration');
+console.log('Frontal stop, rear penetration, shallow ricochet, energy loss and rotated armor orientation passed');scene.dispose();engine.dispose();

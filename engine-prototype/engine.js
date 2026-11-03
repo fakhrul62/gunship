@@ -13,6 +13,7 @@
  const cannonPresentation=new window.CannonPresentation(B,scene,combatAssets);
  const surfaceImpacts=new window.SurfaceImpacts(B,scene,combatAssets,(x,z)=>groundHeight(x,z),(kind,pos)=>sound(kind,pos));
  const vehicleComponents=new window.VehicleComponents(B,combatAssets);
+ const armorModel=new window.ArmorModel(B);
  const playerDamage=new window.PlayerDamage(B,combatAssets,(x,z)=>groundHeight(x,z));
  const aircraftDamage=new window.AircraftDamage(B,combatAssets,(x,z)=>groundHeight(x,z),(root,pos)=>{burst(pos,'explosion');sound('explosion',pos);combatAssets.wreck(root)});
  const localApkAssets=new window.LocalApkAssets(B,scene);
@@ -164,7 +165,7 @@ $('mission-tag').textContent='DESERT SECTOR / OPERATION 0'+(i+1);$('toast').clas
  }
  function shot(origin,dir,friendly,target=null,rocket=false){
   if(game.bullets.length>=90)return;const mesh=rocket?(missilePool.pop()||missileMesh()):(tracerPool.pop()||createTracer());
-  mesh.setEnabled(true);if(rocket)for(const part of mesh.getChildMeshes())part.setEnabled(true);mesh.scaling.setAll(1);mesh.isVisible=true;for(const child of mesh.getChildMeshes())child.isVisible=true;if(!rocket)mesh.material=friendly?cannonMat:shotMat;mesh.position.copyFrom(origin);dir=dir.normalizeToNew();mesh.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(B.Axis.Y,dir,new B.Quaternion());game.objects.push(mesh);
+  mesh.setEnabled(true);mesh.metadata={...mesh.metadata,armorResult:null};if(rocket)for(const part of mesh.getChildMeshes())part.setEnabled(true);mesh.scaling.setAll(1);mesh.isVisible=true;for(const child of mesh.getChildMeshes())child.isVisible=true;if(!rocket)mesh.material=friendly?cannonMat:shotMat;mesh.position.copyFrom(origin);dir=dir.normalizeToNew();mesh.rotationQuaternion=B.Quaternion.FromUnitVectorsToRef(B.Axis.Y,dir,new B.Quaternion());game.objects.push(mesh);
   const inherited=friendly?forward().scale(game.speed||0):B.Vector3.Zero();game.bullets.push({mesh,vel:dir.scale(rocket?85:friendly?900:360).add(inherited),friendly,target,rocket,life:rocket?10:friendly?3.2:3,age:0,trail:0,tracer:rocket||!friendly||((game.player.metadata?.cannon?.shots||0)%3===0)});if(rocket){const b=game.bullets.at(-1);mesh.scaling.setAll(.55);missileFlight.initialize(b,inherited);mesh.getChildMeshes().find(m=>m.name==='motorFlame')?.setEnabled(false)}else if(!friendly)combatParticles(origin,'flash')
  }
  function fire(rocket=false){
@@ -188,9 +189,15 @@ $('mission-tag').textContent='DESERT SECTOR / OPERATION 0'+(i+1);$('toast').clas
     if(b.rocket){missileFlight.step(b,step);
     }else{b.vel.y-=9.81*step;b.vel.scaleInPlace(Math.exp(-.035*step))}
     const next=old.add(b.vel.scale(step));let t=terrainHit(old,next),hit=null,impactMesh=null,impactSurface='sand',impactNormal=B.Vector3.Up();const cover=sector?.hitInfo(old,next);if(cover&&(t===null||cover.t<t)){t=cover.t;impactMesh=cover.mesh;impactNormal=cover.normal;impactSurface=cover.surface}
-    const candidates=b.friendly?g.enemies.filter(e=>!e.dead):[{obj:g.player,air:true,flightDamage:g.playerSystems}];
+    const candidates=b.friendly?g.enemies.filter(e=>!e.dead&&!b.passedTargets?.has(e)):[{obj:g.player,air:true,flightDamage:g.playerSystems}];
     for(const e of candidates){const broad=sweepSphere(old,next,e.obj.position.add(new B.Vector3(0,e.air?0:7,0)),28);if(broad===null)continue;const travel=next.subtract(old),length=travel.length();if(length<1e-6)continue;const ray=new B.Ray(old,travel.scale(1/length),length);for(const mesh of e.obj.getChildMeshes()){if(mesh.metadata?.visualOnly||(!e.flightDamage&&(mesh.name==='blade'||mesh.name.includes('Rotor'))))continue;const pick=ray.intersectsMesh(mesh,false);if(pick.hit&&pick.distance<=length){const impact=pick.distance/length;if(t===null||impact<t){t=impact;hit=e;impactMesh=mesh;impactSurface='metal';impactNormal=pick.getNormal(true)||b.vel.normalizeToNew().scale(-1)}}}}
-    if(t!==null){const pos=B.Vector3.Lerp(old,next,t);b.mesh.position.copyFrom(pos);b.life=0;if(b.rocket)explode(pos,170,hit,impactMesh);else if(hit){surfaceImpacts.emit('metal',pos,impactNormal,b.vel.normalizeToNew(),impactMesh);if(b.friendly)damageEnemy(hit,22,pos,false,impactMesh);else damagePlayer(4,pos,impactMesh)}else{surfaceImpacts.emit(impactSurface,pos,impactNormal,b.vel.normalizeToNew(),impactMesh)}break}
+    if(t!==null){const pos=B.Vector3.Lerp(old,next,t);b.mesh.position.copyFrom(pos);b.life=0;if(b.rocket)explode(pos,170,hit,impactMesh);else if(hit){surfaceImpacts.emit('metal',pos,impactNormal,b.vel.normalizeToNew(),impactMesh);if(b.friendly){
+       const armor=armorModel.resolve(hit,impactMesh,impactNormal,b.vel,b.penetration??(95*Math.pow(b.vel.length()/900,2)));
+       b.mesh.metadata={...b.mesh.metadata,armorResult:armor.kind};damageEnemy(hit,22*armor.damage,pos,false,impactMesh);
+       b.passedTargets??=new Set();b.passedTargets.add(hit);
+       if(armor.kind==='ricochet'&&(b.ricochets||0)<2){b.ricochets=(b.ricochets||0)+1;b.vel=b.vel.subtract(armor.normal.scale(2*B.Vector3.Dot(b.vel,armor.normal))).scale(.55);b.life=Math.max(.2,1.5-b.age);b.tracer=true;b.mesh.position.copyFrom(pos.add(armor.normal.scale(.15)));b.penetration=armor.remaining}
+       else if(armor.kind==='penetration'&&armor.remaining>8&&b.passedTargets.size<3){b.penetration=armor.remaining;b.vel.scaleInPlace(Math.sqrt(Math.max(.1,armor.remaining/95)));b.life=Math.max(.1,3.2-b.age);b.mesh.position.copyFrom(pos.add(b.vel.normalizeToNew().scale(.15)))}
+      }else damagePlayer(4,pos,impactMesh)}else{surfaceImpacts.emit(impactSurface,pos,impactNormal,b.vel.normalizeToNew(),impactMesh)}break}
     b.mesh.position.copyFrom(next);
    }
    if(!b.rocket){const distance=B.Vector3.Distance(camera.position,b.mesh.position),pixel=distance*2*Math.tan(camera.fov/2)/engine.getRenderHeight(),width=B.Scalar.Clamp(pixel*.9/.12,1,5);b.mesh.scaling.set(width,B.Scalar.Clamp(b.vel.length()*.004/5,.6,1.8),width);b.mesh.isVisible=b.tracer;for(const child of b.mesh.getChildMeshes())child.isVisible=b.tracer;}
