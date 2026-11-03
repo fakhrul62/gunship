@@ -1,5 +1,7 @@
 # Gunship - Rotor Strike
 
+Current follow-up work: [release progress](RELEASE-PROGRESS.md) and [measured performance, limitations and test commands](PERFORMANCE.md). High/Balanced graphics controls preserve native resolution.
+
 Play: https://fakhrul62.github.io/gunship/
 
 A browser helicopter combat game built with Babylon.js. Includes an interactive 3D hangar, third-person flight, three staged missions, enemy helicopters, animated tanks and turrets, a tactical minimap, cannon ballistics, missile locking, explosions and debris. All missions and weapons are free.

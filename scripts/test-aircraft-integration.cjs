@@ -1,7 +1,7 @@
 // Controlled fired-round fixtures against the actual enemy GLB and running game loop.
 const {chromium}=require('playwright'),assert=require('assert');
 (async()=>{
- const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
+ const browser=await chromium.launch(require('./browser-launch.cjs'));
  try{
   const p=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];
   p.on('pageerror',e=>errors.push(e.message));

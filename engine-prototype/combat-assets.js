@@ -8,7 +8,7 @@ window.CombatAssets=class CombatAssets {
   }catch(error){console.warn('Optional local combat effects unavailable',error)}
  }
  emit(kind,position,size,options={}){
-  if(!this.ready||this.items.length>=384||!this.managers[kind])return false;
+  if(!this.ready||this.items.length>=(this.budget||384)||!this.managers[kind])return false;
   if(this.items.filter(i=>i.kind===kind).length>=(kind==='trail'?256:32))return false;
   const sprite=new this.B.Sprite(kind,this.managers[kind]);sprite.position.copyFrom(position);sprite.width=sprite.height=size;sprite.color=options.color||new this.B.Color4(1,1,1,options.alpha??1);sprite.angle=options.angle||0;const cell=Math.floor(Math.random()*this.data.sprites[kind].frames);
   this.items.push({kind,sprite,cell,age:0,duration:options.duration||this.data.sprites[kind].duration,anchor:options.anchor,offset:options.anchor?position.subtract(options.anchor.position):null,size,alpha:options.alpha??1,velocity:options.velocity,drift:options.drift||0,grow:options.grow||0});return true

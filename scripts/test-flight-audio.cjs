@@ -1,5 +1,5 @@
 const {chromium}=require('playwright'),assert=require('assert');
-(async()=>{const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});try{
+(async()=>{const browser=await chromium.launch(require('./browser-launch.cjs'));try{
  const p=await browser.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('http://127.0.0.1:8765/engine-prototype/');await p.waitForFunction(()=>document.querySelector('#hangar-status').hidden,null,{timeout:120000});await p.locator('#launch').click();await p.locator('.mission-card').first().click();await p.waitForFunction(()=>!document.querySelector('#hud').classList.contains('hidden'),null,{timeout:120000});
  const initial=await p.evaluate(async()=>{const B=BABYLON;window.eng=B.Engine.Instances[0];window.s=eng.scenes[0];window.loop=eng._activeRenderLoops[0];eng.stopRenderLoop();eng.getDeltaTime=()=>50;s.render=()=>{};window.fx=s.metadata.flightAudio;await fx.audio.resume();for(let i=0;i<5;i++)loop();return{buffers:Object.keys(fx.buffers),loops:fx.loops.size,state:fx.audio.state,looped:[...fx.loops.values()].every(l=>l.source.loop)}});
  assert.equal(initial.buffers.length,4);assert(initial.loops>=2&&initial.loops<=10&&initial.looped);assert.equal(initial.state,'running');

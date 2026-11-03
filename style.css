@@ -72,3 +72,4 @@
 .effects-credit{position:absolute;bottom:70px;right:7vw;color:#aeb5a5;font:9px monospace;pointer-events:auto;text-decoration:none}
 #flight-damage{position:absolute;top:96px;left:32px;max-width:min(440px,calc(100vw - 64px));padding:10px 14px;border-left:3px solid #e9bb72;background:rgba(15,22,19,.9);color:#f4d7a0;font:11px/1.7 monospace;letter-spacing:.5px;pointer-events:none}
 #flight-damage[data-critical="true"]{border-color:#ff795b;color:#ffc1aa}
+.graphics-hint{font:11px/1.6 monospace;color:#b6c2bf;max-width:380px;margin:0 0 18px}

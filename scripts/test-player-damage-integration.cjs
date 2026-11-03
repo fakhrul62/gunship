@@ -1,5 +1,5 @@
 const {chromium}=require('playwright'),assert=require('assert');
-(async()=>{const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});try{
+(async()=>{const browser=await chromium.launch(require('./browser-launch.cjs'));try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8765/engine-prototype/');await page.waitForFunction(()=>document.querySelector('#hangar-status').hidden,null,{timeout:120000});
  async function launch(){
@@ -20,10 +20,9 @@ const {chromium}=require('playwright'),assert=require('assert');
   const dir=B.Vector3.TransformNormal(B.Axis.Y,shot.getWorldMatrix()).normalize(),g={player};let hit;
   for(const mesh of player.getChildMeshes()){
    if(mesh.metadata?.visualOnly||mesh.getTotalVertices()<3)continue;mesh.computeWorldMatrix(true);
-   const center=mesh.getBoundingInfo().boundingBox.centerWorld;
-   if(classifier.classify(g,mesh,center)!==part)continue;
-   const pick=new B.Ray(center.subtract(dir.scale(80)),dir,160).intersectsMesh(mesh,false);
-   if(pick.hit&&classifier.classify(g,mesh,pick.pickedPoint)===part){hit=pick;break}
+   const probes=[mesh.getBoundingInfo().boundingBox.centerWorld],vertices=mesh.getVerticesData('position'),indices=mesh.getIndices(),stride=Math.max(3,Math.ceil(indices.length/6000/3)*3);
+   for(let k=0;k<indices.length;k+=stride){const point=B.Vector3.Zero();for(let j=0;j<3;j++){const n=indices[k+j]*3;point.addInPlace(new B.Vector3(vertices[n],vertices[n+1],vertices[n+2]))}probes.push(B.Vector3.TransformCoordinates(point.scale(1/3),mesh.getWorldMatrix()))}
+   for(const center of probes){if(classifier.classify(g,mesh,center)!==part)continue;const pick=new B.Ray(center.subtract(dir.scale(80)),dir,160).intersectsMesh(mesh,false);if(pick.hit&&classifier.classify(g,mesh,pick.pickedPoint)===part){hit=pick;break}}if(hit)break;
   }
   if(!hit)throw Error('No player surface for '+part);
   shot.position.copyFrom(hit.pickedPoint.subtract(dir.scale(.02)));ms=.1;loop();loop();ms=50;

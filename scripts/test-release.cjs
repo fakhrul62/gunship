@@ -1,6 +1,6 @@
 // Headless smoke/capture; timing from software rendering is not a hardware FPS claim.
 const {chromium}=require('playwright'),assert=require('assert');
-(async()=>{const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});try{
+(async()=>{const browser=await chromium.launch(require('./browser-launch.cjs'));try{
  const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[],shaderErrors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&/shader|compile|GL_INVALID/i.test(m.text()))shaderErrors.push(m.text().slice(0,150))});
  await page.goto(process.env.GAME_URL||'http://127.0.0.1:8765/engine-prototype/');
