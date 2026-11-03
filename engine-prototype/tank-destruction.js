@@ -1,6 +1,6 @@
 /* Bounded component debris; poses are preserved when leaving the source hierarchy. */
 window.TankDestruction=class TankDestruction{
- constructor(B,scene,height){this.B=B;this.scene=scene;this.height=height;this.parts=[];this.wrecks=[];this.materials=[]}
+ constructor(B,scene,height,onBounce=()=>{}){this.onBounce=onBounce;this.B=B;this.scene=scene;this.height=height;this.parts=[];this.wrecks=[];this.materials=[]}
  destroy(root,impact){
   if(root.metadata?.destroyed)return false;const B=this.B;root.metadata={...root.metadata,destroyed:true};
   const combat=root.metadata.combat;for(const group of [...(combat?.clips||[]),combat?.drive,combat?.ready].filter(Boolean))group.stop();
@@ -24,7 +24,7 @@ window.TankDestruction=class TankDestruction{
  update(dt){const B=this.B;for(const part of this.parts){if(part.sleep||part.pivot.isDisposed())continue;const steps=Math.max(1,Math.ceil(dt/.016)),step=dt/steps;for(let k=0;k<steps;k++){
    part.age+=step;part.velocity.y-=9.81*step;part.velocity.scaleInPlace(Math.exp(-.08*step));part.pivot.position.addInPlace(part.velocity.scale(step));part.pivot.rotation.addInPlace(part.spin.scale(step));part.pivot.computeWorldMatrix(true);
    const bounds=part.pivot.getHierarchyBoundingVectors(true);const support=Math.max(this.height(bounds.min.x,bounds.min.z),this.height(bounds.max.x,bounds.max.z),this.height(part.pivot.position.x,part.pivot.position.z));
-   if(bounds.min.y<support+.08){part.pivot.position.y+=support+.08-bounds.min.y;if(part.velocity.y<0){part.velocity.y=-part.velocity.y*(part.heavy?.12:.22);part.velocity.x*=.6;part.velocity.z*=.6;part.spin.scaleInPlace(.45);part.bounces++}if(part.velocity.length()<1.2||part.bounces>=5){part.sleep=true;part.velocity.setAll(0);part.spin.setAll(0)}}
+   if(bounds.min.y<support+.08){part.pivot.position.y+=support+.08-bounds.min.y;if(part.velocity.y<0){if(part.bounces===0)this.onBounce(part.pivot.position,Math.abs(part.velocity.y));part.velocity.y=-part.velocity.y*(part.heavy?.12:.22);part.velocity.x*=.6;part.velocity.z*=.6;part.spin.scaleInPlace(.45);part.bounces++}if(part.velocity.length()<1.2||part.bounces>=5){part.sleep=true;part.velocity.setAll(0);part.spin.setAll(0)}}
    if(part.age>15){part.sleep=true;part.velocity.setAll(0)}
   }}for(const wreck of this.wrecks)wreck.age+=dt;
  }
