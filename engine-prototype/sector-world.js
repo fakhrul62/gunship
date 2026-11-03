@@ -13,6 +13,7 @@ window.SectorWorld=class SectorWorld{
   this.materials.concrete=make('weatheredBlastwalls','#9e9276');this.materials.steel=make('outpostSteel','#5b6251');this.materials.dark=make('rubberAndChar','#37352e');this.materials.sand=make('barrierFill','#b7a482');this.materials.mark=make('landingPaint','#d7d0b7');
   const tex=new B.DynamicTexture('concreteSurface',256,scene,false),ctx=tex.getContext();ctx.fillStyle='#aaa08b';ctx.fillRect(0,0,256,256);for(let i=0;i<3000;i++){ctx.fillStyle=i%2?'#969080':'#bbb09b';ctx.fillRect((i*73)%256,(i*127)%256,2,2)}tex.update();this.materials.concrete.albedoTexture=tex;
   const add=(name,x,z,w,h,d,kind='concrete',solid=true)=>{const m=B.MeshBuilder.CreateBox(name,{width:w,height:h,depth:d},scene);m.position.set(x,height(x,z)+h/2,z);m.material=this.materials[kind];m.receiveShadows=true;m.isPickable=false;this.meshes.push(m);if(solid){m.computeWorldMatrix(true);const bb=m.getBoundingInfo().boundingBox;this.cover.push({min:bb.minimumWorld.clone(),max:bb.maximumWorld.clone(),mesh:m,surface:kind==='steel'||kind==='dark'?'metal':'concrete'})}return m};this.add=add;
+  const bump=new B.Texture('../assets/materials/brown_mud_dry-normal.webp',scene);bump.gammaSpace=false;bump.level=.15;bump.uScale=bump.vScale=2;this.materials.concrete.bumpTexture=bump;
   this.buildRoad();
   for(const loc of this.landmarks){const {x,z}=loc;
    // Gapped perimeter leaves the road and vehicle firing lanes clear.
@@ -21,6 +22,10 @@ window.SectorWorld=class SectorWorld{
    add('operationsShelter',x-65,z+40,24,8,15,'sand');add('shelterRoof',x-65,z+40,27,.6,18,'steel',false).position.y=height(x-65,z+40)+8;
    for(let n=0;n<3;n++){const cx=x-76+n*9;add('equipmentContainer',cx,z+70,7,5,16,'steel');for(let rib=0;rib<5;rib++)add('containerRib',cx-3.6,z+64+rib*3,.2,5,.2,'dark',false)}
    for(let n=0;n<6;n++){const drum=B.MeshBuilder.CreateCylinder('fuelDrum',{height:3,diameter:2.3,tessellation:10},scene);drum.position.set(x+65+(n%3)*4,height(x+65+(n%3)*4,z+65+Math.floor(n/3)*4)+1.5,z+65+Math.floor(n/3)*4);drum.material=this.materials.dark;drum.isPickable=false;drum.freezeWorldMatrix();this.meshes.push(drum)}
+   // Low fighting positions leave central roads and aircraft firing lanes open.
+   for(const side of [-1,1])for(let row=0;row<2;row++)for(let n=0;n<5;n++)add('revetmentBag',x+side*82+(n-2)*2.2,z-28+row*.7,2,.65,1.4,'sand');
+   for(const side of [-1,1]){add('revetmentBack',x+side*82,z-24,13,1.6,2,'sand');add('checkpointGatePost',x+side*16,z-91,1.2,4,1.2,'steel');}
+   add('shelterDoor',x-65,z+32.4,4,6,.15,'dark',false);for(const dx of [-7,7])add('shelterWindow',x-65+dx,z+32.4,3,1.5,.15,'dark',false).position.y+=3;
    const towerX=x+75,towerZ=z+40;for(const dx of [-4,4])for(const dz of [-4,4])add('towerLeg',towerX+dx,towerZ+dz,.6,25,.6,'steel');add('towerDeck',towerX,towerZ,12,1,12,'steel',false).position.y=height(towerX,towerZ)+24;
    const dish=B.MeshBuilder.CreateSphere('radarDish',{diameter:10,segments:12,slice:.5},scene);dish.position.set(towerX,height(towerX,towerZ)+29,towerZ);dish.rotation.x=-Math.PI/3;dish.scaling.y=.25;dish.material=this.materials.steel;dish.isPickable=false;this.meshes.push(dish);
    for(const mesh of this.meshes.slice(-8))shadows.addShadowCaster(mesh,false);
