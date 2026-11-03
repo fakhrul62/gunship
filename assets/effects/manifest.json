@@ -1,0 +1,50 @@
+{
+  "sprites": {
+    "fireball": {
+      "file": "fireball.png",
+      "frames": 64,
+      "duration": 2.0,
+      "animated": true
+    },
+    "groundblast": {
+      "file": "groundblast.png",
+      "frames": 64,
+      "duration": 2.4,
+      "animated": true
+    },
+    "burning": {
+      "file": "burning.png",
+      "frames": 64,
+      "duration": 2.1,
+      "animated": true
+    },
+    "smoke": {
+      "file": "smoke.png",
+      "frames": 25,
+      "duration": 5,
+      "animated": false
+    },
+    "dust": {
+      "file": "dust.png",
+      "frames": 25,
+      "duration": 3.5,
+      "animated": false
+    },
+    "flash": {
+      "file": "flash.png",
+      "frames": 9,
+      "duration": 0.13,
+      "animated": false
+    },
+    "trail": {
+      "file": "dust.png",
+      "frames": 25,
+      "duration": 1.8,
+      "animated": false
+    }
+  },
+  "sounds": [
+    "explosion-rocket.wav",
+    "explosion-vehicle.wav"
+  ]
+}

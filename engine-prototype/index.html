@@ -13,13 +13,14 @@
     <div class="hud-brand"><span class="dot"></span><span>ROTOR <b>STRIKE</b></span><small id="mission-tag">OPERATION 01</small></div>
     <div class="hud-objective"><small>MISSION OBJECTIVE</small><strong id="objective">DESTROY HOSTILE TARGETS</strong><div class="objective-track"><i id="objective-fill"></i></div></div>
     <div class="hud-readouts"><div><small>HULL</small><div class="hull-bar"><i id="hull-fill"></i></div></div><div class="weapon"><small>WEAPON</small><b id="weapon-label">30MM CANNON</b></div><div class="altitude"><small>ALT</small><b id="altitude">1200 <em>FT</em></b></div></div>
+    <div id="flight-damage" role="status" hidden></div>
   </header>
   <div id="reticle" class="hidden"><i></i><b></b><i></i></div>
   <div id="toast" class="toast hidden"></div>
   <section id="screen-menu" class="screen">
     <div class="menu-copy"><div class="eyebrow"><span></span> TACTICAL FLIGHT SIMULATION</div><h1>ROTOR<br><i>STRIKE</i></h1><p class="lede">WINGS OF FIRE. NO STRINGS ATTACHED.</p><p class="intro">Take the controls. Fly into hostile territory. Bring your squadron home.</p><div class="menu-actions"><button class="primary" id="launch">SELECT OPERATION <span>↗</span></button><button class="text-button" id="controls-link">FLIGHT CONTROLS <span>＋</span></button></div><div class="free-note"><span>●</span> ALL MISSIONS AVAILABLE <b>·</b> NO PURCHASES · NO CURRENCY</div></div>
     <div id="hangar-view" tabindex="0" aria-label="Helicopter inspection. Drag to rotate, scroll to zoom, arrow keys to rotate."><div class="hangar-heading">AIRCRAFT INSPECTION <span>VIPER 01</span></div><div id="hangar-status">LOADING AIRCRAFT...</div><div class="hangar-caption"><strong>ODZ-10AG</strong><span>ATTACK HELICOPTER / READY FOR SORTIE</span><small>DRAG TO ROTATE &nbsp; / &nbsp; SCROLL TO ZOOM</small><button id="hangar-reset" class="text-button">RESET VIEW</button></div></div>
-    <a class="asset-credit" href="https://polyhaven.com/" target="_blank" rel="noopener">Powered by Poly Haven</a><div class="menu-footer"><span>FLIGHT SYSTEMS // 01.01</span><span>SIMULATION MODE <i>● ONLINE</i></span><span>DHaka A.O. / SECTOR 07</span></div>
+    <a class="asset-credit" href="https://polyhaven.com/" target="_blank" rel="noopener">Powered by Poly Haven</a><a class="effects-credit" href="../assets/effects/CREDITS.md" target="_blank" rel="noopener">VFX: fscopel / Kenney</a><div class="menu-footer"><span>FLIGHT SYSTEMS // 01.01</span><span>SIMULATION MODE <i>● ONLINE</i></span><span>DHaka A.O. / SECTOR 07</span></div>
   </section>
   <section id="screen-missions" class="screen hidden">
     <div class="panel-heading"><div><div class="eyebrow"><span></span> BRIEFING ROOM / ALL SORTIES CLEARED FOR ACCESS</div><h2>CHOOSE YOUR <i>OPERATION</i></h2></div><button class="close-button" id="back-menu">ESC <span>×</span></button></div>
@@ -39,5 +40,12 @@
 <script src="battlefield-material.js"></script>
 <script src="sector-world.js"></script>
 <script src="local-apk-assets.js"></script>
+<script src="tank-destruction.js"></script>
+<script src="cannon-presentation.js"></script>
+<script src="missile-flight.js"></script>
+<script src="surface-impacts.js"></script>
+<script src="vehicle-components.js"></script>
+<script src="aircraft-damage.js"></script>
+<script src="player-damage.js"></script>
 <script src="engine.js"></script>
 </body></html>

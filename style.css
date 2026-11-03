@@ -68,3 +68,7 @@
 .hud-brand small,.hud-objective small,.hud-readouts small{color:#d0d8cf!important;text-shadow:0 1px 3px #000;font-size:10px!important}.hud-objective strong,.hud-readouts b,.hud-brand{color:#f3f1df;text-shadow:0 1px 4px #000}.hud-objective strong{font-size:19px}.hud-readouts b{font-size:15px}
 #missile-lock{top:auto;bottom:24px;left:50%;padding:8px 12px;font-size:10px;background:#0d1916e8;border:1px solid #9b9d7966;color:#e9dfbd}
 @media(max-width:720px){#missile-lock{bottom:185px}.hud-objective strong{font-size:13px}.hud-readouts b{font-size:11px}}
+
+.effects-credit{position:absolute;bottom:70px;right:7vw;color:#aeb5a5;font:9px monospace;pointer-events:auto;text-decoration:none}
+#flight-damage{position:absolute;top:96px;left:32px;max-width:min(440px,calc(100vw - 64px));padding:10px 14px;border-left:3px solid #e9bb72;background:rgba(15,22,19,.9);color:#f4d7a0;font:11px/1.7 monospace;letter-spacing:.5px;pointer-events:none}
+#flight-damage[data-critical="true"]{border-color:#ff795b;color:#ffc1aa}
